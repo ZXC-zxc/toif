@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "toif-convert"
+version = "0.1.0"
+description = ""
+authors = ["ZXC-zxc <xiaochen@ftsafe.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+Pillow = "^8.2.0"
+trezor = "^0.12.2"
+Mako = "^1.1.4"
+construct = "^2.10.67"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

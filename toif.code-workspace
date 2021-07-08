@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "toif-convert"
+		},
+		{
+			"path": "toif-show"
+		},
+		{
+			"path": "toif-mako"
+		}
+	]
+}
