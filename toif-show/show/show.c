@@ -458,37 +458,48 @@ void read_file(char* fname, char** buffer, long* lSize) {
 // 3字节t，2字节l，N字节v
 // v中: 2字节w，2字节h，4字节len，N字节data
 void display_text(int x, int y, char* text) {
-    size_t p = 0;
-    size_t tp = 0;
+    size_t p = 0,tp = 0,utf8l = 0,fontsize = 0;
+    uint8_t* fontdata = NULL;
     while (tp < strlen(text)) {
-        while (p < xiangsu12_SIZE) {
-            if (0 == memcmp(text + tp, xiangsu12 + p, 3)) {//utf8编码的中文是3个字节，不考虑4个字节的生僻字
-                //找到了，开始解数据
-                uint16_t w = *(uint16_t*)(xiangsu12 + p + 3 + 2);
-                uint16_t h = *(uint16_t*)(xiangsu12 + p + 3 + 2 + 2);
-                uint32_t datalen = *(uint32_t*)(xiangsu12 + p + 3 + 2 + 2 + 2);
-                display_icon(x, y, w, h, xiangsu12 + p + 3 + 2 + 2 + 2 + 4, datalen, COLOR_WHITE, COLOR_BLACK);
+        if ((uint8_t)text[tp] < 0x80)
+        {
+            //ansi码
+            utf8l = 1;
+            fontsize = ansi12_SIZE;
+            fontdata = ansi12;
+        }
+        else
+        {
+            //中文
+            utf8l = 3;
+            fontsize = xiangsu12_SIZE;
+            fontdata = xiangsu12;
+        }
+        while (p < fontsize)
+        {
+            if (0 == memcmp(text + tp, fontdata + p, utf8l))
+            { //找到了，开始解数据并显示
+                uint16_t w = *(uint16_t *)(fontdata + p + utf8l + 2);
+                uint16_t h = *(uint16_t *)(fontdata + p + utf8l + 2 + 2);
+                uint32_t datalen = *(uint32_t *)(fontdata + p + utf8l + 2 + 2 + 2);
+                display_icon(x, y, w, h, fontdata + p + utf8l + 2 + 2 + 2 + 4, datalen, COLOR_WHITE, COLOR_BLACK);
                 x = x + w;
-                tp += 3;
-                p = 0;
-                if (tp == strlen(text)) {
-                    return;//显示完了
-                }
-                continue;
-            }
-            else {
-                //找字库中的下一个字
-                p += 3;
-                p += *(uint16_t*)(xiangsu12 + p);
+                break;
+            }else{
+                //没找到找字库中的下一个字
+                p += utf8l;
+                p += *(uint16_t *)(fontdata + p);
                 p += 2;
                 continue;
             }
         }
-        //字库里就没有这个字,先什么都不显示，回头可以显示一个框框
-        p = 0;
-        tp += 3;
-    }
+        if (p >= fontsize){
+            //字库里就没有这个字,先什么都不显示，回头可以显示一个框框
+        }
 
+        p = 0;
+        tp += utf8l;
+    }
 }
 
 #include "images.h"
@@ -503,7 +514,7 @@ int main(int argc, char* argv[])
     //read_file("../../../../../toif-convert/tests/book.toif",&bufferImg ,&lSize);
     //bool valid = display_toif_info(IMG_home, IMG_home_SIZE, &w, &h, &grayscale);
     //display_image(0, 0, w, h, IMG_home + 12, IMG_home_SIZE - 12);
-    char* ch = u8"教程耿用使";
+    char* ch = u8"KKxyz教程耿abc用使";
     display_text(0,0,ch);
 
 

@@ -7,7 +7,10 @@ def C02hex(bs:bytes):
     return "".join(["0x{:02x},".format(x) for x in bs])
 %>\
 
-<%size=0%>\
+<%
+size=0
+asize=0
+%>\
 #include <stdint.h>
 uint8_t xiangsu12[]={
 % for f in fonts:
@@ -16,5 +19,13 @@ uint8_t xiangsu12[]={
 % endfor
 };
 uint32_t xiangsu12_SIZE = ${size};
+
+uint8_t ansi12[]={
+% for a in ansi:
+    ${C02hex(a)} 
+<%asize+=len(a)%>\
+% endfor
+};
+uint32_t ansi12_SIZE = ${asize};
 
 #endif
